@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap");
+:root{--teal:#0F5257;--teal2:#0B3E42;--sun:#FFC93C;--ink:#10231F;--paper:#F6FAF7;--line:#CFE0D9;--mut:#5B7A72;--err:#C0392B;--ok:#13795B}
+*{box-sizing:border-box}
+html{background:var(--teal)}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--teal);color:var(--ink);font-family:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;font-size:16px;line-height:1.5;padding-top:env(safe-area-inset-top,0px)}
+.top{padding:28px 24px 30px;max-width:520px;width:100%;margin:0 auto;color:#fff}
+h1{font-size:34px;line-height:1.2;font-weight:800;margin:0 0 6px}
+.top p{margin:0;color:#BFE0D8;font-size:15px}
+.sheet{flex:1;background:var(--paper);border-radius:30px 30px 0 0;padding:28px 24px calc(32px + env(safe-area-inset-bottom,0px))}
+.in{max-width:520px;margin:0 auto}
+label{display:block;font-weight:700;font-size:14px;margin:16px 0 6px}
+input{width:100%;height:54px;padding:0 16px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:17px}
+input:focus-visible{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(15,82,87,.15)}
+button{width:100%;height:56px;margin-top:24px;border:0;border-radius:14px;background:var(--teal);color:#fff;font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+button:hover{background:var(--teal2)}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+button:disabled{opacity:.55;cursor:default}
+button.ghost{background:transparent;color:var(--teal);border:2px solid var(--line)}
+button.ghost:hover{background:#fff}
+.m{min-height:22px;margin-top:12px;font-size:15px;font-weight:600}.er{color:var(--err)}.ok{color:var(--ok)}
+.badge{position:relative;width:100%;max-width:330px;margin:0 auto;background:var(--sun);color:var(--ink);border-radius:22px;padding:42px 24px 20px;transform:rotate(-2deg);box-shadow:0 18px 30px -14px rgba(0,0,0,.45)}
+.badge::before{content:"";position:absolute;top:14px;left:50%;width:64px;height:12px;margin-left:-32px;border-radius:8px;background:var(--teal)}
+.badge .fn{font-size:36px;font-weight:800;line-height:1.15;min-height:42px;word-break:break-word}
+.badge .ln{font-size:30px;font-weight:400;line-height:1.2;min-height:36px;word-break:break-word;opacity:.8}
+.badge .ft{margin-top:18px;padding-top:12px;border-top:2px dashed rgba(16,35,31,.35);display:flex;justify-content:space-between;font-weight:700}
+.badge .empty{opacity:.35}
+.done{text-align:center;padding:8px 0}
+.done h2{font-size:26px;margin:0 0 4px}.done p{color:var(--mut);margin:0}
+.bar{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.bar b{font-size:20px}.bar span{color:var(--mut);font-size:14px}
+.list{list-style:none;margin:16px 0 0;padding:0}
+.list li{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.av{flex:none;width:46px;height:46px;border-radius:50%;background:var(--sun);display:grid;place-items:center;font-weight:800;font-size:20px}
+.who{flex:1;min-width:0}.who b{display:block;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{font-size:13px;color:var(--mut)}
+.age{flex:none;font-weight:800;font-size:20px;color:var(--teal)}
+.age small{display:block;font-size:12px;font-weight:600;color:var(--mut);text-align:center}
+.none{text-align:center;color:var(--mut);padding:32px 0}
+@media (prefers-reduced-motion:no-preference){.badge{transition:transform .25s}.badge.pop{transform:rotate(0) scale(1.03)}}

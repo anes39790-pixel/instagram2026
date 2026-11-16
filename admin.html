@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F5257">
+<meta name="robots" content="noindex">
+<title>لوحة المالك</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1 id="h">دخول المالك</h1>
+  <p id="sub">هذه الصفحة لك وحدك.</p>
+</header>
+<main class="sheet"><div class="in">
+  <div id="login">
+    <label for="pw">الكود</label><input id="pw" type="password" autocomplete="off" autocapitalize="off">
+    <button id="in">دخول</button>
+    <div class="m er" id="lm" role="status"></div>
+  </div>
+  <div id="panel" hidden>
+    <input id="q" type="search" placeholder="ابحث بالاسم أو اللقب" aria-label="بحث">
+    <div class="bar" style="margin-top:16px"><b id="n">0 مسجّل</b><span id="shown"></span></div>
+    <ul class="list" id="rows"></ul>
+    <button class="ghost" id="out">خروج</button>
+  </div>
+</div></main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig, ownerEmail, codeSuffix } from "./firebase-config.js";
+const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+const $ = i => document.getElementById(i);
+let unsub = null, data = [];
+function render(){
+  const q = $("q").value.trim().toLowerCase();
+  const list = data.filter(r => (r.first + " " + r.last).toLowerCase().includes(q));
+  $("shown").textContent = q ? "نتائج: " + list.length : "";
+  const ul = $("rows"); ul.textContent = "";
+  if (!list.length) {
+    const li = document.createElement("li"); li.className = "none";
+    li.textContent = data.length ? "لا توجد نتيجة بهذا الاسم." : "لم يسجّل أحد بعد. شارك رابط التسجيل ليظهر المسجّلون هنا.";
+    ul.appendChild(li); return;
+  }
+  list.forEach(r => {
+    const li = document.createElement("li");
+    const av = document.createElement("div"); av.className = "av"; av.textContent = (r.first || "?").charAt(0);
+    const who = document.createElement("div"); who.className = "who";
+    const b = document.createElement("b"); b.textContent = r.first + " " + r.last;
+    const s = document.createElement("span"); s.textContent = r.at && r.at.toDate ? r.at.toDate().toLocaleString("ar", {dateStyle: "medium", timeStyle: "short"}) : "";
+    who.append(b, s);
+    const age = document.createElement("div"); age.className = "age"; age.textContent = r.age;
+    const sm = document.createElement("small"); sm.textContent = "سنة"; age.appendChild(sm);
+    li.append(av, who, age); ul.appendChild(li);
+  });
+}
+$("q").addEventListener("input", render);
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("in").click(); });
+$("in").addEventListener("click", async () => {
+  $("lm").textContent = "";
+  try { await signInWithEmailAndPassword(auth, ownerEmail, $("pw").value.replace(/\s+/g, "").toLowerCase() + codeSuffix); }
+  catch (e) { $("lm").textContent = "الكود غير صحيح."; }
+});
+$("out").addEventListener("click", () => signOut(auth));
+onAuthStateChanged(auth, user => {
+  if (unsub) { unsub(); unsub = null; }
+  $("login").hidden = !!user; $("panel").hidden = !user;
+  $("h").textContent = user ? "المسجّلون" : "دخول المالك";
+  $("sub").textContent = user ? "كل من سجّل يظهر هنا مباشرة." : "هذه الصفحة لك وحدك.";
+  if (!user) return;
+  unsub = onSnapshot(query(collection(db, "registrations"), orderBy("at", "desc")), snap => {
+    data = snap.docs.map(d => d.data());
+    $("n").textContent = data.length + " مسجّل";
+    render();
+  }, () => { $("n").textContent = "هذا الحساب ليس حساب المالك."; });
+});
+</script>
+</body>
+</html>

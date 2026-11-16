@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F5257">
+<title>سجّل اسمك</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>سجّل اسمك</h1>
+  <p>اكتب معلوماتك وشاهد شارتك تتكوّن أمامك.</p>
+</header>
+<div class="top" style="padding-top:0;padding-bottom:0;margin-bottom:-34px;position:relative;z-index:1">
+  <div class="badge" id="badge">
+    <div class="fn empty" id="pf">الاسم</div>
+    <div class="ln empty" id="pl">كلمة المرور</div>
+    <div class="ft"><span>العمر</span><span id="pa" class="empty">—</span></div>
+  </div>
+</div>
+<main class="sheet"><div class="in" style="padding-top:34px">
+  <div id="form">
+    <label for="fn">الاسم</label><input id="fn" maxlength="40" autocomplete="given-name">
+    <label for="ln">كلمة المرور</label><input id="ln" maxlength="40" autocomplete="family-name">
+    <label for="ag">العمر</label><input id="ag" type="number" inputmode="numeric" min="1" max="120">
+    <button id="go">تسجيل</button>
+    <div class="m" id="msg" role="status"></div>
+  </div>
+  <div class="done" id="done" hidden>
+    <h2 id="dt">تم تسجيلك</h2>
+    <p>وصلت معلوماتك بنجاح.</p>
+    <button class="ghost" id="again">تسجيل شخص آخر</button>
+  </div>
+</div></main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+const db = getFirestore(initializeApp(firebaseConfig));
+const $ = i => document.getElementById(i), msg = $("msg"), go = $("go");
+const say = (t, c = "") => { msg.textContent = t; msg.className = "m " + c; };
+function preview(){
+  const f = $("fn").value.trim(), l = $("ln").value.trim(), a = $("ag").value.trim();
+  [["pf", f, "الاسم"], ["pl", l, "اللقب"], ["pa", a, "—"]].forEach(([id, v, ph]) => {
+    const e = $(id); e.textContent = v || ph; e.classList.toggle("empty", !v);
+  });
+}
+["fn", "ln", "ag"].forEach(i => $(i).addEventListener("input", preview));
+go.addEventListener("click", async () => {
+  const first = $("fn").value.trim(), last = $("ln").value.trim(), age = parseInt($("ag").value, 10);
+  if (!first || !last || !(age > 0 && age < 121)) return say("أكمل الاسم واللقب وأدخل عمراً بين 1 و120.", "er");
+  go.disabled = true; say("جاري الإرسال…");
+  try {
+    await addDoc(collection(db, "registrations"), { first, last, age, at: serverTimestamp() });
+    $("form").hidden = true; $("done").hidden = false;
+    $("dt").textContent = "تم تسجيلك يا " + first;
+    $("badge").classList.add("pop");
+  } catch (e) { say("تعذّر إرسال التسجيل. تحقق من الاتصال وحاول مرة أخرى.", "er"); }
+  go.disabled = false;
+});
+$("again").addEventListener("click", () => {
+  ["fn", "ln", "ag"].forEach(i => $(i).value = "");
+  preview(); say("");
+  $("badge").classList.remove("pop");
+  $("done").hidden = true; $("form").hidden = false; $("fn").focus();
+});
+</script>
+</body>
+</html>
